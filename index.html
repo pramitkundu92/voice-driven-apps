@@ -1,0 +1,45 @@
+<html>
+    <head>
+        <title>Voice Driven App</title>
+    </head>
+    <body>
+        <h4 id="main">Make sure you have your mic on and start talking to me!</h4>
+        <script type="text/javascript" src="jquery.min.js"></script>
+        <script type="text/javascript" src="commands.js"></script>
+        <script>
+            var appResponseHandler = function(request,response){
+                if(request == 'alert'){
+                    alert(response);
+                }
+                else if(request == 'take input'){
+                    voiceCommands.getUserInput(function(input){
+                        console.log(input);
+                    });                    
+                }
+                else if(request == 'sleep'){
+                    voiceCommands.stop();
+                }
+                else if(request == 'new command'){
+                    $.ajax({
+                        method: 'GET',
+                        url: 'http://localhost:1000/updatecomm?name=' + response.name + '&response=' + response.response
+                    }).done(function(res){
+                        voiceCommands.setCommands(res);
+                    });
+                }
+            };
+            setTimeout(function(){
+                if(voiceCommands){
+                    $.ajax({
+                        method: 'GET',
+                        url: 'http://localhost:1000/commands'
+                    }).done(function(res){
+                        voiceCommands.setCommands(res);
+                        voiceCommands.setResponseHandler(appResponseHandler);
+                        voiceCommands.start();
+                    });                    
+                }    
+            },1000);
+        </script>
+    </body>
+</html>
