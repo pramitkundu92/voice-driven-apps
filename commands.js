@@ -8,6 +8,42 @@ window.speechSynthesis.onvoiceschanged = function(){
     voiceCommands.selectedVoice = voices[2];
 };
 
+//calculating closest match based on Levenshtein distance
+var minimum = function(a,b,c){
+    return a<b?a<c?a:c:b<c?b:c;
+};
+var detailedMatch = function(a,b){
+    a = a.toLowerCase();
+    b = b.toLowerCase();
+    var x = a.replace(/\s/g,'').split('');
+    var y = b.replace(/\s/g,'').split('');
+    var diff = 0,arr = [],m = x.length+1, n=y.length+1,sub;
+    if(a==b || a.replace(/\s/g,'')==b.replace(/\s/g,'')){
+        return true;
+    }
+    else {
+        arr[0] = [];
+        arr[0][0] = 0;
+        for(var i=0;i<m;i++){
+            arr[0][i+1] = i+1;
+        }
+        for(var j=0;j<n;j++){
+            arr[j+1] = [];
+            arr[j+1][0] = j+1;
+        }
+        for(var j=1;j<n;j++){
+            for(var i=1;i<m;i++){
+                if(x[i-1]==y[j-1]) sub = 0;
+                else sub = 1;
+                arr[i][j] = minimum(arr[i-1][j]+1, arr[i][j-1]+1, arr[i-1][j-1]+sub);
+            }
+        }
+        diff = arr[m-1][n-1];
+        var minLength = minimum(m-1,n-1,10000000);
+        return (diff/minLength<=0.25);
+    }
+};
+
 var handleCommand = function(c){
     if(c.response.indexOf('ask for text')>-1){
         takingCommands = false;
@@ -30,7 +66,7 @@ var handleCommand = function(c){
         voiceCommands.speak(c.response);
         responseHandler.apply(null,[c.name,c.response]); 
     }    
-}
+};
 
 var addNewCommand = function(cmdName){
     voiceCommands.speak('I did not recognize that command');
@@ -121,12 +157,12 @@ voiceCommands.start = function(){
         }  
     };    
     recognition.onresult = function(e){
-        console.log(e.results[0][0].transcript);
         var flag = true;
         for(key in e.results[0]){
+            console.log(e.results[0][key].transcript);
             if(flag && e.results[0][key].transcript !== undefined){
                 commands.forEach(function(c){
-                    if(flag && c.name.toLowerCase() == e.results[0][key].transcript.toLowerCase()){
+                    if(flag && detailedMatch(e.results[0][key].transcript,c.name)){
                         handleCommand(c);
                         flag = false;
                     }
