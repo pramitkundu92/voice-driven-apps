@@ -9,6 +9,15 @@ window.speechSynthesis.onvoiceschanged = function(){
 };
 
 //calculating closest match based on Levenshtein distance
+var disp = function(arr,m,n){
+    for(var i=0;i<m;i++){
+        var v = '';
+        for(var j=0;j<n;j++){
+            v += arr[i][j] + ' ';
+        }
+        console.log(v);
+    }
+};
 var minimum = function(a,b,c){
     return a<b?a<c?a:c:b<c?b:c;
 };
@@ -22,19 +31,23 @@ var detailedMatch = function(a,b){
         return true;
     }
     else {
-        arr[0] = [];
-        arr[0][0] = 0;
         for(var i=0;i<m;i++){
-            arr[0][i+1] = i+1;
+            arr[i] = [];
+            for(var j=0;j<n;j++){
+                arr[i][j] = -1;
+            }
         }
-        for(var j=0;j<n;j++){
-            arr[j+1] = [];
-            arr[j+1][0] = j+1;
+        arr[0][0] = 0;
+        for(var i=0;i<m-1;i++){
+            arr[i+1][0] = i+1;
+        }
+        for(var j=0;j<n-1;j++){
+            arr[0][j+1] = j+1;
         }
         for(var j=1;j<n;j++){
             for(var i=1;i<m;i++){
                 if(x[i-1]==y[j-1]) sub = 0;
-                else sub = 1;
+                else sub = 1; 
                 arr[i][j] = minimum(arr[i-1][j]+1, arr[i][j-1]+1, arr[i-1][j-1]+sub);
             }
         }
