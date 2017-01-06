@@ -9,15 +9,6 @@ window.speechSynthesis.onvoiceschanged = function(){
 };
 
 //calculating closest match based on Levenshtein distance
-var disp = function(arr,m,n){
-    for(var i=0;i<m;i++){
-        var v = '';
-        for(var j=0;j<n;j++){
-            v += arr[i][j] + ' ';
-        }
-        console.log(v);
-    }
-};
 var minimum = function(a,b,c){
     return a<b?a<c?a:c:b<c?b:c;
 };
@@ -172,7 +163,6 @@ voiceCommands.start = function(){
     recognition.onresult = function(e){
         var flag = true;
         for(key in e.results[0]){
-            console.log(e.results[0][key].transcript);
             if(flag && e.results[0][key].transcript !== undefined){
                 commands.forEach(function(c){
                     if(flag && detailedMatch(e.results[0][key].transcript,c.name)){
