@@ -44,7 +44,7 @@ var detailedMatch = function(a,b){
         }
         diff = arr[m-1][n-1];
         var minLength = minimum(m-1,n-1,10000000);
-        return (diff/minLength<=0.25);
+        return (diff/minLength<=0.2);
     }
 };
 
@@ -53,18 +53,20 @@ var handleCommand = function(c){
         takingCommands = false;
         recognition.stop(); 
         voiceCommands.speak('please say something for the ' + c.name);
-        var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition)();
-        recognitionInner.lang = 'en-US';
-        recognitionInner.interimResults = false;
-        recognitionInner.maxAlternatives = 5;    
-        recognitionInner.start();
-        recognitionInner.onresult = function(e){
-            responseHandler.apply(null,[c.name,e.results[0][0].transcript]);
-        };
-        recognitionInner.onend = function(e){
-            recognition.start();
-            takingCommands = true;  
-        };
+        setTimeout(function(){
+            var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition                       || window.msSpeechRecognition || window.oSpeechRecognition)();
+            recognitionInner.lang = 'en-US';
+            recognitionInner.interimResults = false;
+            recognitionInner.maxAlternatives = 5;    
+            recognitionInner.start();
+            recognitionInner.onresult = function(e){
+                responseHandler.apply(null,[c.name,e.results[0][0].transcript]);
+            };
+            recognitionInner.onend = function(e){
+                recognition.start();
+                takingCommands = true;  
+            };
+        },1000);
     }
     else{
         voiceCommands.speak(c.response);
@@ -73,8 +75,7 @@ var handleCommand = function(c){
 };
 
 var addNewCommand = function(cmdName){
-    voiceCommands.speak('I did not recognize that command');
-    voiceCommands.speak('please tell me what should I respond');
+    voiceCommands.speak('Command not recognized, please tell me what to respond');
     setTimeout(function(){
         voiceCommands.getUserInput(function(input){
             if(input != 'cancel'){
@@ -86,7 +87,7 @@ var addNewCommand = function(cmdName){
             }
             else voiceCommands.speak('new command cancelled');
         });
-    },4000);
+    },2250);
 };
 
 voiceCommands.getUserInput = function(cb){
@@ -115,7 +116,7 @@ voiceCommands.speak = function(text){
     msg.pitch = 1; //0 to 2
     msg.text = text;
     msg.lang = 'en-US';
-    window.speechSynthesis.speak(msg);  
+    window.speechSynthesis.speak(msg); 
 };
 
 voiceCommands.setCommands = function(cmdList){
@@ -174,7 +175,7 @@ voiceCommands.start = function(){
         }
         if(flag){
             addNewCommand(e.results[0][0].transcript);
-        }
+        }           
     };
 };
 
