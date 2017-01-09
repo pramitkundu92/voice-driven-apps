@@ -44,11 +44,12 @@ var detailedMatch = function(a,b){
         }
         diff = arr[m-1][n-1];
         var minLength = minimum(m-1,n-1,10000000);
-        return (diff/minLength<=0.2);
+        return (diff/minLength<=0.1);
     }
 };
 
 var handleCommand = function(c){
+    console.log('Command - ' + c.name);
     if(c.response.indexOf('ask for text')>-1){
         takingCommands = false;
         recognition.stop(); 
@@ -75,6 +76,7 @@ var handleCommand = function(c){
 };
 
 var addNewCommand = function(cmdName){
+    console.log('Unrecognized Command - ' + cmdName);
     voiceCommands.speak('Command not recognized, please tell me what to respond');
     setTimeout(function(){
         voiceCommands.getUserInput(function(input){
@@ -82,12 +84,26 @@ var addNewCommand = function(cmdName){
                 var obj = {};
                 obj.name = cmdName;
                 obj.response = input;
+                console.log('Response - ' + input);
                 responseHandler.apply(null,['new command',obj]);
                 voiceCommands.speak('new command added');
             }
             else voiceCommands.speak('new command cancelled');
         });
     },2250);
+};
+
+var performSearch = function(text){
+    var pos = text.indexOf('search for');
+    var searchText = text.substring(pos+11,text.length);
+    console.log('Searching in Google for - ' + searchText);
+    //window.open('https://www.google.com/search?q=' + searchText, '_blank');
+    $.ajax({
+        type: 'GET',
+        url: 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&cx=014918255508942225227:m3yrvj0uyhg&q=' + searchText,
+    }).done(function(res){
+        window.open(res.items[0].link,'_blank');
+    });
 };
 
 voiceCommands.getUserInput = function(cb){
@@ -117,6 +133,7 @@ voiceCommands.speak = function(text){
     msg.text = text;
     msg.lang = 'en-US';
     window.speechSynthesis.speak(msg); 
+    console.log('Speaking - ' + text);
 };
 
 voiceCommands.setCommands = function(cmdList){
@@ -174,7 +191,10 @@ voiceCommands.start = function(){
             }
         }
         if(flag){
-            addNewCommand(e.results[0][0].transcript);
+            if(e.results[0][0].transcript.toLowerCase().indexOf('search for')!=0) {
+                addNewCommand(e.results[0][0].transcript);
+            }
+            else performSearch(e.results[0][0].transcript.toLowerCase());
         }           
     };
 };
