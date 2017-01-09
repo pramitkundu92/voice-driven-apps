@@ -102,7 +102,8 @@ var performSearch = function(text){
         type: 'GET',
         url: 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&cx=014918255508942225227:m3yrvj0uyhg&q=' + searchText,
     }).done(function(res){
-        window.open(res.items[0].link,'google search');
+        window.open(res.items[0].link,'google search'
+        /*use this to make it open in new window ,'location=yes,height=570,width=520,scrollbars=yes,status=yes'*/);
     });
 };
 
