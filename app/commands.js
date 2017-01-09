@@ -102,7 +102,7 @@ var performSearch = function(text){
         type: 'GET',
         url: 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&cx=014918255508942225227:m3yrvj0uyhg&q=' + searchText,
     }).done(function(res){
-        window.open(res.items[0].link,'_blank');
+        window.open(res.items[0].link,'google search');
     });
 };
 
@@ -114,7 +114,7 @@ var playYoutube = function(text){
         type: 'GET',
         url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&q=' + searchText,
     }).done(function(res){
-        window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'_blank');
+        window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'youtube');
     });
 };
 
