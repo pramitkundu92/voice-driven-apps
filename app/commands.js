@@ -1,7 +1,7 @@
 var voiceCommands = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition;
 
 var commands = [];
-var recognition,takingCommands,responseHandler;
+var recognition,takingCommands,responseHandler,triggerStart = 'start listening',triggerStop = 'stop listening',startedAI = false;
 
 window.speechSynthesis.onvoiceschanged = function(){
     var voices = window.speechSynthesis.getVoices();
@@ -179,23 +179,35 @@ voiceCommands.start = function(){
         }  
     };    
     recognition.onresult = function(e){
-        var flag = true;
-        for(key in e.results[0]){
-            if(flag && e.results[0][key].transcript !== undefined){
-                commands.forEach(function(c){
-                    if(flag && detailedMatch(e.results[0][key].transcript,c.name)){
-                        handleCommand(c);
-                        flag = false;
-                    }
-                });
+        if(detailedMatch(e.results[0][0].transcript,triggerStart)||detailedMatch(e.results[0][0].transcript,triggerStop)) {
+            if(detailedMatch(e.results[0][0].transcript.toLowerCase(),triggerStart)){
+                voiceCommands.speak('I am listening');
+                startedAI = true;    
+            } 
+            else {
+                voiceCommands.speak('I won\'t listen anymore');
+                startedAI = false;
             }
         }
-        if(flag){
-            if(e.results[0][0].transcript.toLowerCase().indexOf('search for')!=0) {
-                addNewCommand(e.results[0][0].transcript);
+        else if(startedAI){
+            var flag = true;
+            for(key in e.results[0]){
+                if(flag && e.results[0][key].transcript !== undefined){
+                    commands.forEach(function(c){
+                        if(flag && detailedMatch(e.results[0][key].transcript,c.name)){
+                            handleCommand(c);
+                            flag = false;
+                        }
+                    });
+                }
             }
-            else performSearch(e.results[0][0].transcript.toLowerCase());
-        }           
+            if(flag){
+                if(e.results[0][0].transcript.toLowerCase().indexOf('search for')!=0) {
+                    addNewCommand(e.results[0][0].transcript);
+                }
+                else performSearch(e.results[0][0].transcript.toLowerCase());
+            }    
+        }                   
     };
 };
 
