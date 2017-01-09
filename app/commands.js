@@ -106,6 +106,18 @@ var performSearch = function(text){
     });
 };
 
+var playYoutube = function(text){
+    var pos = text.indexOf('play on youtube');
+    var searchText = text.substring(pos+16,text.length);
+    console.log('Playing on Youtube - ' + searchText);
+    $.ajax({
+        type: 'GET',
+        url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&q=' + searchText,
+    }).done(function(res){
+        window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'_blank');
+    });
+};
+
 voiceCommands.getUserInput = function(cb){
     takingCommands = false;
     recognition.stop(); 
@@ -202,10 +214,13 @@ voiceCommands.start = function(){
                 }
             }
             if(flag){
-                if(e.results[0][0].transcript.toLowerCase().indexOf('search for')!=0) {
-                    addNewCommand(e.results[0][0].transcript);
+                if(e.results[0][0].transcript.toLowerCase().indexOf('search for')==0) {
+                    performSearch(e.results[0][0].transcript.toLowerCase());
                 }
-                else performSearch(e.results[0][0].transcript.toLowerCase());
+                else if(e.results[0][0].transcript.toLowerCase().indexOf('play on youtube')==0) {
+                    playYoutube(e.results[0][0].transcript.toLowerCase());
+                }
+                else addNewCommand(e.results[0][0].transcript);
             }    
         }                   
     };
