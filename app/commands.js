@@ -1,7 +1,8 @@
 var voiceCommands = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition;
 
 var commands = [];
-var recognition,takingCommands,responseHandler,triggerStart = 'start listening',triggerStop = 'stop listening',startedAI = false;
+var recognition,takingCommands,responseHandler,triggerStart = 'start listening',triggerStop = 'stop listening',
+    startedAI = false,searchTab,youtubeTab;
 
 window.speechSynthesis.onvoiceschanged = function(){
     var voices = window.speechSynthesis.getVoices();
@@ -102,7 +103,7 @@ var performSearch = function(text){
         type: 'GET',
         url: 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&cx=014918255508942225227:m3yrvj0uyhg&q=' + searchText,
     }).done(function(res){
-        window.open(res.items[0].link,'google search'
+        searchTab = window.open(res.items[0].link,'google search'
         /*use this to make it open in new window ,'location=yes,height=570,width=520,scrollbars=yes,status=yes'*/);
     });
 };
@@ -115,8 +116,14 @@ var playYoutube = function(text){
         type: 'GET',
         url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&q=' + searchText,
     }).done(function(res){
-        window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'youtube');
+        youtubeTab = window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'youtube');
     });
+};
+
+var closeYoutube = function(){
+    if(closeYoutube){
+        youtubeTab.close();
+    }
 };
 
 voiceCommands.getUserInput = function(cb){
@@ -220,6 +227,9 @@ voiceCommands.start = function(){
                 }
                 else if(e.results[0][0].transcript.toLowerCase().indexOf('play on youtube')==0) {
                     playYoutube(e.results[0][0].transcript.toLowerCase());
+                }
+                else if(e.results[0][0].transcript.toLowerCase().indexOf('close youtube')==0) {
+                    closeYoutube();
                 }
                 else addNewCommand(e.results[0][0].transcript);
             }    
