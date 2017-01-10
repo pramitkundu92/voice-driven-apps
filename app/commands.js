@@ -1,7 +1,7 @@
 var voiceCommands = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition;
 
 var commands = [];
-var recognition,takingCommands,responseHandler,triggerStart = 'start listening',triggerStop = 'stop listening',
+var recognition,takingCommands,responseHandler,triggerStart = 'start',triggerStop = 'stop',
     startedAI = false,searchTab,youtubeTab;
 
 window.speechSynthesis.onvoiceschanged = function(){
@@ -95,8 +95,8 @@ var addNewCommand = function(cmdName){
 };
 
 var performSearch = function(text){
-    var pos = text.indexOf('search for');
-    var searchText = text.substring(pos+11,text.length);
+    var pos = text.indexOf('search');
+    var searchText = text.substring(pos+7,text.length);
     console.log('Searching in Google for - ' + searchText);
     //window.open('https://www.google.com/search?q=' + searchText, '_blank');
     $.ajax({
@@ -109,8 +109,8 @@ var performSearch = function(text){
 };
 
 var playYoutube = function(text){
-    var pos = text.indexOf('play on youtube');
-    var searchText = text.substring(pos+16,text.length);
+    var pos = text.indexOf('play');
+    var searchText = text.substring(pos+5,text.length);
     console.log('Playing on Youtube - ' + searchText);
     $.ajax({
         type: 'GET',
@@ -201,11 +201,11 @@ voiceCommands.start = function(){
     recognition.onresult = function(e){
         if(detailedMatch(e.results[0][0].transcript,triggerStart)||detailedMatch(e.results[0][0].transcript,triggerStop)) {
             if(detailedMatch(e.results[0][0].transcript.toLowerCase(),triggerStart)){
-                voiceCommands.speak('I am listening');
+                voiceCommands.speak('Voice assist on');
                 startedAI = true;    
             } 
             else {
-                voiceCommands.speak('I won\'t listen anymore');
+                voiceCommands.speak('Voice assist off');
                 startedAI = false;
             }
         }
@@ -222,13 +222,13 @@ voiceCommands.start = function(){
                 }
             }
             if(flag){
-                if(e.results[0][0].transcript.toLowerCase().indexOf('search for')==0) {
+                if(e.results[0][0].transcript.toLowerCase().indexOf('search')==0) {
                     performSearch(e.results[0][0].transcript.toLowerCase());
                 }
-                else if(e.results[0][0].transcript.toLowerCase().indexOf('play on youtube')==0) {
+                else if(e.results[0][0].transcript.toLowerCase().indexOf('play')==0) {
                     playYoutube(e.results[0][0].transcript.toLowerCase());
                 }
-                else if(e.results[0][0].transcript.toLowerCase().indexOf('close youtube')==0) {
+                else if(e.results[0][0].transcript.toLowerCase().indexOf('stop playing')==0) {
                     closeYoutube();
                 }
                 else addNewCommand(e.results[0][0].transcript);
