@@ -4,6 +4,9 @@ var commands = [];
 var recognition,takingCommands,responseHandler,triggerStart = 'start',triggerStop = 'stop',
     startedAI = false,searchTab,youtubeTab;
 
+var DEVELOPER_KEY = 'AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8', //personal key in Google API Console
+    CSE_ID = '014918255508942225227:m3yrvj0uyhg'; //personal Google custom search engine ID
+
 window.speechSynthesis.onvoiceschanged = function(){
     var voices = window.speechSynthesis.getVoices();
     voiceCommands.selectedVoice = voices[2];
@@ -98,13 +101,34 @@ var performSearch = function(text){
     var pos = text.indexOf('search');
     var searchText = text.substring(pos+7,text.length);
     console.log('Searching in Google for - ' + searchText);
-    //window.open('https://www.google.com/search?q=' + searchText, '_blank');
     $.ajax({
         type: 'GET',
-        url: 'https://www.googleapis.com/customsearch/v1?key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&cx=014918255508942225227:m3yrvj0uyhg&q=' + searchText,
+        url: 'https://www.googleapis.com/customsearch/v1?key=' + DEVELOPER_KEY + '&cx=' + CSE_ID + '&q=' + searchText,
     }).done(function(res){
         searchTab = window.open(res.items[0].link,'google search'
-        /*use this to make it open in new window ,'location=yes,height=570,width=520,scrollbars=yes,status=yes'*/);
+        /*use this to make it open in a new window ,'location=yes,height=570,width=520,scrollbars=yes,status=yes'*/);
+    });
+};
+
+var getVideoId = function(item){
+    return new Promise(function(resolve,reject){
+        var type = item.id.kind.split('#')[1];
+        if(type == 'video'){
+            resolve(item.id.videoId);
+        }
+        else {
+            playlistId = item.id.playlistId;
+            $.ajax({
+                type: 'GET',
+                url: 'https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=' + playlistId + '&key=' + DEVELOPER_KEY,
+            }).done(function(response){
+                if(response.items[0].snippet.resourceId.videoId){
+                    resolve(response.items[0].snippet.resourceId.videoId);
+                }
+            }).fail(function(err){
+                reject(err);
+            });
+        }    
     });
 };
 
@@ -114,9 +138,11 @@ var playYoutube = function(text){
     console.log('Playing on Youtube - ' + searchText);
     $.ajax({
         type: 'GET',
-        url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8&q=' + searchText,
-    }).done(function(res){
-        youtubeTab = window.open('https://www.youtube.com/watch?v=' + res.items[0].id.videoId,'youtube');
+        url: 'https://www.googleapis.com/youtube/v3/search?part=snippet&key=' + DEVELOPER_KEY + '&q=' + searchText,
+    }).done(function(response){
+        getVideoId(response.items[0]).then(function(result){
+            youtubeTab = window.open('https://www.youtube.com/watch?v=' + result ,'youtube');    
+        });
     });
 };
 
@@ -199,8 +225,8 @@ voiceCommands.start = function(){
         }  
     };    
     recognition.onresult = function(e){
-        if(detailedMatch(e.results[0][0].transcript,triggerStart)||detailedMatch(e.results[0][0].transcript,triggerStop)) {
-            if(detailedMatch(e.results[0][0].transcript.toLowerCase(),triggerStart)){
+        if(e.results[0][0].transcript == triggerStart || e.results[0][0].transcript == triggerStop) {
+            if(e.results[0][0].transcript == triggerStart){
                 voiceCommands.speak('Voice assist on');
                 startedAI = true;    
             } 
