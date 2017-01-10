@@ -147,9 +147,10 @@ var playYoutube = function(text){
 };
 
 var closeYoutube = function(){
-    if(closeYoutube){
+    if(youtubeTab){
         youtubeTab.close();
     }
+    else voiceCommands.speak('am not playing anything');
 };
 
 voiceCommands.getUserInput = function(cb){
