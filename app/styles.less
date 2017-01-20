@@ -1,0 +1,160 @@
+@base: #5e5e5e;
+@header: 18px;
+@footer: 11px;
+@normal: 13px;
+@margin-body: 15px;
+@input-size: 200px;
+
+.center() {
+    text-align: center;
+}
+.position(@type) {
+    position: @type;
+}
+.position(@b, @type) {
+    .position(@type);
+    & when (@b = top){
+        top: 0;
+        right: 0;
+        left: 0;
+    }
+    & when (@b = right){
+        top: 0;
+        right: 0;
+        bottom: 0;
+    }
+    & when (@b = left){
+        left: 0;
+        top: 0;
+        bottom: 0;
+    }
+    & when (@b = bottom){
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }          
+}
+.border-radius(@radius) {
+    -webkit-border-radius: @radius;
+    -moz-border-radius: @radius;
+    -ms-border-radius: @radius;
+    border-radius: @radius;
+}
+.border(@radius, @color) {
+    .border-radius(@radius);
+    border: 2px solid @color;
+}
+.border(@radius, @color, @side) {
+    .border-radius(@radius);
+     & when (@side = bottom){
+        border-bottom: 1px solid @color;
+    }
+    & when (@side = right){
+        border-right: 1px solid @color;
+    }
+    & when (@side = left){
+        border-left: 1px solid @color;
+    }
+    & when (@side = top){
+        border-top: 1px solid @color;
+    }
+}
+.margin(@a) {
+    margin: @a;
+}
+.margin(@top, @right, @bottom, @left) {
+    margin: @top @right @bottom @left;
+}
+.margin(@a, @b) {
+    & when (isnumber(@b)){
+        margin: @a @b;
+    }
+    & when (@b = top){
+        margin-top: @a;
+    }
+    & when (@b = right){
+        margin-right: @a;
+    }
+    & when (@b = left){
+        margin-left: @a;
+    }
+    & when (@b = bottom){
+        margin-bottom: @a;
+    }
+}
+.padding(@a) {
+    padding: @a;
+}
+.padding(@top, @right, @bottom, @left) {
+    padding: @top @right @bottom @left;
+}
+.padding(@a, @b) {
+    & when (ispixel(@b)){
+        padding: @a @b;
+    }
+    & when (@b = top){
+        padding-top: @a;
+    }
+    & when (@b = right){
+        padding-right: @a;
+    }
+    & when (@b = left){
+        padding-left: @a;
+    }
+    & when (@b = bottom){
+        padding-bottom: @a;
+    }
+}
+
+body {
+    .position(relative);
+    background-color: lighten(@base, 70%);
+    font-size: @normal;
+    .margin(@margin-body, left);
+    .margin(@margin-body, right);
+    .margin(@margin-body, top);
+    header {
+        font-size: @header;
+        .center();
+        .border(0px, lighten(@base, 20%), bottom);
+        .padding(10px, 0px);
+        .position(top, fixed);
+        background-color: #efefef;
+    }
+    footer {
+        font-size: @footer;
+        .border(0px, lighten(@base, 20%), top);
+        .padding(10px, 0px);
+        .center();
+        .position(bottom, fixed);
+        background-color: #efefef;
+    }
+    .main {
+        overflow-y: auto;
+        .margin(50px, 10px, 10px, 10px);
+        .center();
+        form {
+            .form-control {
+                .margin(20px, 0px);
+                label {
+                    .margin(80px, right);
+                }
+                input {
+                    width: @input-size;
+                    .border(7px, lighten(@base, 10%));
+                }
+                textarea {
+                    width: @input-size;
+                    .border(10px, lighten(@base, 10%));
+                }
+            }
+            button {
+                .border(8px, lighten(@base, 35%));
+                cursor: pointer;
+                &:hover {
+                    box-shadow: 0 5px 5px solid lighten(@base, 10%);
+                }
+            }
+        }
+    }    
+}

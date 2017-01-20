@@ -1,0 +1,76 @@
+body {
+  position: relative;
+  background-color: #ffffff;
+  font-size: 13px;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 15px;
+}
+body header {
+  font-size: 18px;
+  text-align: center;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
+  border-radius: 0px;
+  border-bottom: 1px solid #919191;
+  padding: 10px 0px;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  background-color: #efefef;
+}
+body footer {
+  font-size: 11px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  -ms-border-radius: 0px;
+  border-radius: 0px;
+  border-top: 1px solid #919191;
+  padding: 10px 0px;
+  text-align: center;
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background-color: #efefef;
+}
+body .main {
+  overflow-y: auto;
+  margin: 50px 10px 10px 10px;
+  text-align: center;
+}
+body .main form .form-control {
+  margin: 20px 0px;
+}
+body .main form .form-control label {
+  margin-right: 80px;
+}
+body .main form .form-control input {
+  width: 200px;
+  -webkit-border-radius: 7px;
+  -moz-border-radius: 7px;
+  -ms-border-radius: 7px;
+  border-radius: 7px;
+  border: 2px solid #787878;
+}
+body .main form .form-control textarea {
+  width: 200px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  -ms-border-radius: 10px;
+  border-radius: 10px;
+  border: 2px solid #787878;
+}
+body .main form button {
+  -webkit-border-radius: 8px;
+  -moz-border-radius: 8px;
+  -ms-border-radius: 8px;
+  border-radius: 8px;
+  border: 2px solid #b7b7b7;
+  cursor: pointer;
+}
+body .main form button:hover {
+  box-shadow: 0 5px 5px solid #787878;
+}

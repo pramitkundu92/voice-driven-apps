@@ -1,5 +1,18 @@
 module.exports = function(grunt){
     grunt.initConfig({
+        less: {
+            development: {
+                options: {
+                    /*compress: true,
+                    yuicompress: true,
+                    optimization: 2,
+                    cleancss: true*/
+                },
+                files: {
+                    'app/styles.css': ['app/styles.less']
+                }
+            }
+        },
         express: {
             dev: {
                 options: {
@@ -15,12 +28,21 @@ module.exports = function(grunt){
                     interrupt: true,
                     spawn: false
                 }
+            },
+            less: {
+                files: ['app/styles.less'],
+                tasks: ['less'],
+                options: {
+                    interrupt: true,
+                    spawn: false
+                }
             }
         }
     });
     
     grunt.loadNpmTasks('grunt-express-server');
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-less');
     
-    grunt.registerTask('start',['express','watch']);
+    grunt.registerTask('start',['less','express','watch']);
 };
