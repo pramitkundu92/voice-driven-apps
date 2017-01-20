@@ -6,8 +6,15 @@
   "author": "Pramit Kundu",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "express": "~4.9.0",
     "http": "^0.0.0",
     "socket.io": "^1.0.6"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-express-server": "^0.5.3"
   }
 }

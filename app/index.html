@@ -1,10 +1,17 @@
+<!DOCTYPE html>
 <html>
     <head>
         <title>Voice Driven App</title>
     </head>
     <body>
         <h4 id="main"><center>Make sure you have your microphone turned on and start talking to me!</center></h4>
+        <video height="150" width="150" id="localVideo" autoplay muted></video>
+        <button onClick="capture()">Capture a shot</button>
+        <canvas id="canvas"></canvas>
+        <button onClick="record()">Record for 2 secs</button>
+        <audio id="record"></audio>
         <center><img src="logo.jpg" height="300" width="700"/></center>
+        
         <script type="text/javascript" src="jquery.min.js"></script>
         <script type="text/javascript" src="commands.js"></script>
         <script>
@@ -41,6 +48,99 @@
                     });                    
                 }    
             },1000);
+            //for capturing audio/video
+            var localStream,mediaRecorder,recordedChunks = [],voice;
+            var localVideo = document.getElementById('localVideo');
+            var recordedAudio = document.getElementById('record');
+            var constraints = {
+                audio: true,
+                video: true
+            };
+            if(window.localStorage.recorderVoice){
+                voice = window.localStorage.recorderVoice;
+            }
+            var getUserMediaSuccess = function(stream){
+                localStream = stream;
+                localVideo.src = window.URL.createObjectURL(stream);
+            }
+            navigator.getUserMedia = ( navigator.getUserMedia ||
+                       navigator.webkitGetUserMedia ||
+                       navigator.mozGetUserMedia ||
+                       navigator.msGetUserMedia
+            );
+            if(navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia(constraints).then(getUserMediaSuccess);
+            } else {
+                alert('Your browser does not support getUserMedia API');
+            } 
+            var capture = function(){
+                var canvas = document.getElementById('canvas');
+                canvas.width = 150;
+                canvas.height = 150;
+                var ctx = canvas.getContext('2d'); 
+                ctx.drawImage(localVideo, 0, 0, canvas.width, canvas.height);
+            };
+            var record = function(){
+                var options = {mimeType: 'audio/webm'};
+                recordedChunks.length = 0;
+                mediaRecorder = new MediaRecorder(localStream, options);  
+                mediaRecorder.start();
+                mediaRecorder.ondataavailable = function(event){
+                    if(event.data.size > 0){
+                        recordedChunks.push(event.data);
+                    }
+                };
+                mediaRecorder.onstop = function(event){
+                    var buff = new Blob(recordedChunks);
+                    recordedAudio.src = window.URL.createObjectURL(buff); 
+                    recordedAudio.play();
+                    var arrayBuffer;
+                    var fileReader = new FileReader();
+                    fileReader.onload = function() {
+                        arrayBuffer = this.result;
+                        if(window.localStorage.recorderVoice == undefined) {
+                            voice = new Uint8Array(arrayBuffer);
+                            window.localStorage.recorderVoice = new Uint8Array(arrayBuffer);
+                        }
+                        else {
+                            var c = 0,l = voice.length,m;
+                            newVoice = new Uint8Array(arrayBuffer);
+                            if(l>newVoice.length) l = newVoice.length;
+                            for(var i=0;i<l;i++){
+                                if(Math.abs(voice[i]-newVoice[i])>50) {
+                                    c++;
+                                }
+                            }
+                            console.log(l+','+c);
+                        }
+                    };
+                    fileReader.readAsArrayBuffer(buff);  
+                };
+                setTimeout(function(){
+                    if(mediaRecorder.state!='inactive'){
+                        mediaRecorder.stop();
+                    }
+                },1000);
+            };
+            // converts blob to base64
+            var blobToBase64 = function(blob, cb) {
+                var reader = new FileReader();
+                reader.onload = function() {
+                    var dataUrl = reader.result;
+                    var base64 = dataUrl.split(',')[1];
+                    cb(base64);
+                };
+                reader.readAsDataURL(blob);
+            };
+            function ab2str(buf) {
+                var s = '';
+                var arr = new Uint8Array(buf);
+                console.log(String.fromCharCode(arr[0]));
+                for(var i=0;i<buf.byteLength;i++){
+                    s += String.fromCharCode.apply(null, buf.slice(i,i+1)[0]);
+                }
+                return s;
+            };
         </script>
     </body>
 </html>
