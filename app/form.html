@@ -1,39 +1,49 @@
+<!DOCTYPE html5>
 <html>
     <head>
+        <meta charset="utf-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+        <!-- including favicon -->
+		<link rel="icon" type="image/png" sizes="16x16" href="ban.png"/>
         <title>A form styled by LESS</title>
         <link rel="stylesheet" href="styles.css"/>
     </head>
     <body>
         <header>A Simple User Data form</header>
         <div class="main">
+            <a onclick="showMobileUrl()">View Mobile URL</a>
             <form>
                 <div class="form-control">
                     <label for="FirstName">First Name</label>
-                    <input name="FirstName" id="FirstName" type="text"/>
+                    <input name="FirstName" id="firstname" type="text"/>
                 </div>
                 <div class="form-control">
                     <label for="LastName">Last Name</label>
-                    <input name="LastName" id="LastName" type="text"/>
+                    <input name="LastName" id="lastname" type="text"/>
                 </div>
                 <div class="form-control">
                     <label for="Password">Password</label>
-                    <input name="Password" id="Password" type="password"/>
+                    <input name="Password" id="password" type="password"/>
                 </div>
                 <div class="form-control">
                     <label for="Address">Address</label>
-                    <textarea name="Address" id="Address"></textarea>
+                    <textarea name="Address" id="address"></textarea>
                 </div>
                 <div class="form-control">
                     <label for="Mobile">Mobile</label>
-                    <input name="Mobile" id="Mobile" type="text"/>
+                    <input name="Mobile" id="mobile" type="text"/>
                 </div>
-                <div class="form-control">
-                    <label for="Email">Email</label>
-                    <input name="Email" id="Email" type="email"/>
-                </div>
+                <!--<div class="form-control">
+                    <input name="file" id="file" type="file"/>
+                </div>-->                
                 <button>Register</button>
             </form>
+            <a onclick="triggerEvent()">Trigger an event on your socket</a>
         </div>
         <footer>This is a demo page</footer>
+        <script type="text/javascript" src="jquery.min.js"></script>
+        <script type="text/javascript" src="socket.io.js"></script>
+        <script type="text/javascript" src="commands.js"></script>
+        <script type="text/javascript" src="app.js"></script>
     </body>
 </html>

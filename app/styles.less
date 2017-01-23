@@ -133,19 +133,29 @@ body {
         overflow-y: auto;
         .margin(50px, 10px, 10px, 10px);
         .center();
+        a {
+            text-decoration: underline;
+            cursor: pointer;
+        }
         form {
             .form-control {
+                display: block;
+                width: 100%;
                 .margin(20px, 0px);
                 label {
                     .margin(80px, right);
+                    display: inline-block;
+                    width: @input-size;
                 }
                 input {
                     width: @input-size;
                     .border(7px, lighten(@base, 10%));
+                    display: inline-block;
                 }
                 textarea {
                     width: @input-size;
                     .border(10px, lighten(@base, 10%));
+                    display: inline-block;
                 }
             }
             button {

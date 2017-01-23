@@ -22,7 +22,7 @@ module.exports = function(grunt){
         },
         watch: {
             express: {
-                files: ['app/server.js','app/index.html'],
+                files: ['app/server.js','app/index.html','app/form.html'],
                 tasks: ['express'],
                 options: {
                     interrupt: true,

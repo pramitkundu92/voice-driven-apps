@@ -41,11 +41,19 @@ body .main {
   margin: 50px 10px 10px 10px;
   text-align: center;
 }
+body .main a {
+  text-decoration: underline;
+  cursor: pointer;
+}
 body .main form .form-control {
+  display: block;
+  width: 100%;
   margin: 20px 0px;
 }
 body .main form .form-control label {
   margin-right: 80px;
+  display: inline-block;
+  width: 200px;
 }
 body .main form .form-control input {
   width: 200px;
@@ -54,6 +62,7 @@ body .main form .form-control input {
   -ms-border-radius: 7px;
   border-radius: 7px;
   border: 2px solid #787878;
+  display: inline-block;
 }
 body .main form .form-control textarea {
   width: 200px;
@@ -62,6 +71,7 @@ body .main form .form-control textarea {
   -ms-border-radius: 10px;
   border-radius: 10px;
   border: 2px solid #787878;
+  display: inline-block;
 }
 body .main form button {
   -webkit-border-radius: 8px;
