@@ -63,7 +63,7 @@ var detailedMatch = function(a,b){
 };
 //end of calculating closest match based on Levenshtein distance
 
-var handleCommand = function(c){
+var handleCommand = function(c,text){
     console.log('Command - ' + c.name);
     if(c.response.indexOf('ask for text')>-1){
         takingCommands = false;
@@ -76,7 +76,7 @@ var handleCommand = function(c){
             recognitionInner.maxAlternatives = 5;    
             recognitionInner.start();
             recognitionInner.onresult = function(e){
-                responseHandler.apply(null,[c.name,e.results[0][0].transcript]);
+                responseHandler.apply(c,[c.name,e.results[0][0].transcript]);
             };
             recognitionInner.onend = function(e){
                 recognition.start();
@@ -84,9 +84,13 @@ var handleCommand = function(c){
             };
         },1000);
     }
+    else if(c.special){
+        c.value = c.regexp.exec(text)[1];
+        responseHandler.apply(c,[c.name,c.response]);
+    }
     else{
         voiceCommands.speak(c.response);
-        responseHandler.apply(null,[c.name,c.response]); 
+        responseHandler.apply(c,[c.name,c.response]); 
     }    
 };
 
@@ -100,7 +104,7 @@ var addNewCommand = function(cmdName){
                 obj.name = cmdName;
                 obj.response = input;
                 console.log('Response - ' + input);
-                responseHandler.apply(null,['new command',obj]);
+                responseHandler.apply(obj,['new command',obj]);
                 voiceCommands.speak('new command added');
             }
             else voiceCommands.speak('new command cancelled');
@@ -180,6 +184,8 @@ voiceCommands.getUserInput = function(cb){
 };
 
 voiceCommands.speak = function(text){
+    takingCommands = false;
+    recognition.stop();
     var msg = new SpeechSynthesisUtterance();
     msg.voice = voiceCommands.selectedVoice;
     msg.voiceURI = voiceCommands.selectedVoice.voiceURI;
@@ -190,6 +196,10 @@ voiceCommands.speak = function(text){
     msg.lang = lang;
     window.speechSynthesis.speak(msg); 
     console.log('Speaking - ' + text);
+    setTimeout(function(){
+        recognition.start();
+        takingCommands = true;
+    },1000);
 };
 
 voiceCommands.setCommands = function(cmdList){
@@ -277,8 +287,8 @@ voiceCommands.start = function(){
                 for(key in e.results[0]){
                     if(flag && e.results[0][key].transcript !== undefined){
                         commands.forEach(function(c){
-                            if(flag && c.regexp.exec(e.results[0][key].transcript) !== null){
-                                handleCommand(c);
+                            if(flag && c.regexp.exec(e.results[0][key].transcript.toLowerCase()) !== null){
+                                handleCommand(c,e.results[0][key].transcript.toLowerCase());
                                 flag = false;
                             }
                         });
