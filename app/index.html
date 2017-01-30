@@ -46,16 +46,6 @@
                         method: 'GET',
                         url: 'http://localhost:3000/commands'
                     }).done(function(res){
-                        res.push({
-                            special: true,
-                            name: 'join *meeting here',
-                            response: 'joining meeting'
-                        });
-                        res.push({
-                            special: true,
-                            name: 'show :month expenses',
-                            response: 'showing expenses for'
-                        })
                         voiceCommands.setCommands(res);
                         voiceCommands.setResponseHandler(appResponseHandler);
                         voiceCommands.start();
