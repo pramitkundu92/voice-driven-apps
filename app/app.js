@@ -48,11 +48,12 @@ function showMobileUrl(){
 };
 
 //accelerometer tracking
-if (window.DeviceOrientationEvent) {
+/*if (window.DeviceOrientationEvent) {
     window.addEventListener('deviceorientation', function (event) {
         movedDevice({type: 'orientation', alpha: event.alpha, beta: event.beta, gamma: event.gamma, compass: event.webkitCompassAccuracy});
     }, true);
-} else if (window.DeviceMotionEvent) {
+} else */
+if (window.DeviceMotionEvent) {
     window.addEventListener('devicemotion', function (event) {
         movedDevice({type: 'motion', x: event.acceleration.x, y: event.acceleration.y, z: event.acceleration.z});
     }, true);
@@ -64,4 +65,31 @@ function movedDevice(config){
         case 'motion': socket.emit('motion',config); break;
     }
     
-}
+};
+
+socket.on('move left',function(){
+    console.log('left');
+    var o = $('#movable').position();
+    moveItem({id: 'movable',x: o.left-10, y: o.top});
+});
+socket.on('move right',function(){
+    console.log('right');
+    var o = $('#movable').position();
+    moveItem({id: 'movable',x: o.left+10, y: o.top});
+});
+socket.on('move up',function(){
+    console.log('up');
+    var o = $('#movable').position();
+    moveItem({id: 'movable',x: o.left, y: o.top-10});
+});
+socket.on('move down',function(){
+    console.log('down');
+    var o = $('#movable').position();
+    moveItem({id: 'movable',x: o.left, y: o.top+10});
+});
+
+function moveItem(data){
+    $('#'+data.id).css('left',Math.floor(data.x));
+    $('#'+data.id).css('top',Math.floor(data.y));
+    $('#'+data.id).css('position','absolute');
+};

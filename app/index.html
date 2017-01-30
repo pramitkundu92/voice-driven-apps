@@ -29,7 +29,7 @@
                 else if(request == 'new command'){
                     $.ajax({
                         method: 'GET',
-                        url: 'http://localhost:1000/updatecomm?name=' + response.name + '&response=' + response.response
+                        url: 'http://localhost:3000/updatecomm?name=' + response.name + '&response=' + response.response
                     }).done(function(res){
                         voiceCommands.setCommands(res);
                     });
@@ -39,7 +39,7 @@
                 if(voiceCommands){
                     $.ajax({
                         method: 'GET',
-                        url: 'http://localhost:1000/commands'
+                        url: 'http://localhost:3000/commands'
                     }).done(function(res){
                         voiceCommands.setCommands(res);
                         voiceCommands.setResponseHandler(appResponseHandler);

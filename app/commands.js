@@ -2,14 +2,24 @@ var voiceCommands = window.SpeechRecognition || window.webkitSpeechRecognition |
 
 var commands = [];
 var recognition,takingCommands,responseHandler,triggerStart = 'start',triggerStop = 'stop',
-    startedAI = false,searchTab,youtubeTab;
+    startedAI = false,searchTab,youtubeTab,lang = 'en-US';
 
 var DEVELOPER_KEY = 'AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8', //personal key in Google API Console
     CSE_ID = '014918255508942225227:m3yrvj0uyhg'; //personal Google custom search engine ID
 
+var search = /search (.*)/g;
+var play = /play (.*)/g;
+var mid = /\:\w+/g;
+var end = /(\*[^/]+)$/g;
+
 window.speechSynthesis.onvoiceschanged = function(){
     var voices = window.speechSynthesis.getVoices();
-    voiceCommands.selectedVoice = voices[2];
+    for(i in voices){
+        if(voices[i].lang == lang){
+            voiceCommands.selectedVoice = voices[i];
+            break;
+        }
+    }
 };
 
 //calculating closest match based on Levenshtein distance
@@ -51,6 +61,7 @@ var detailedMatch = function(a,b){
         return (diff/minLength<=0.1);
     }
 };
+//end of calculating closest match based on Levenshtein distance
 
 var handleCommand = function(c){
     console.log('Command - ' + c.name);
@@ -60,7 +71,7 @@ var handleCommand = function(c){
         voiceCommands.speak('please say something for the ' + c.name);
         setTimeout(function(){
             var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition                       || window.msSpeechRecognition || window.oSpeechRecognition)();
-            recognitionInner.lang = 'en-US';
+            recognitionInner.lang = lang;
             recognitionInner.interimResults = false;
             recognitionInner.maxAlternatives = 5;    
             recognitionInner.start();
@@ -98,8 +109,7 @@ var addNewCommand = function(cmdName){
 };
 
 var performSearch = function(text){
-    var pos = text.indexOf('search');
-    var searchText = text.substring(pos+7,text.length);
+    var searchText = search.exec(text)[1];
     console.log('Searching in Google for - ' + searchText);
     $.ajax({
         type: 'GET',
@@ -133,8 +143,7 @@ var getVideoId = function(item){
 };
 
 var playYoutube = function(text){
-    var pos = text.indexOf('play');
-    var searchText = text.substring(pos+5,text.length);
+    var searchText = play.exec(text)[1];
     console.log('Playing on Youtube - ' + searchText);
     $.ajax({
         type: 'GET',
@@ -157,7 +166,7 @@ voiceCommands.getUserInput = function(cb){
     takingCommands = false;
     recognition.stop(); 
     var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition)();
-    recognitionInner.lang = 'en-US';
+    recognitionInner.lang = lang;
     recognitionInner.interimResults = false;
     recognitionInner.maxAlternatives = 5;    
     recognitionInner.start();
@@ -178,15 +187,32 @@ voiceCommands.speak = function(text){
     msg.rate = 1; // 0.1 to 10
     msg.pitch = 1; //0 to 2
     msg.text = text;
-    msg.lang = 'en-US';
+    msg.lang = lang;
     window.speechSynthesis.speak(msg); 
     console.log('Speaking - ' + text);
 };
 
 voiceCommands.setCommands = function(cmdList){
+    var exp;
     commands.length = 0;
     cmdList.forEach(function(c){
-        commands.push(c);
+        if(c.special){
+            if(c.name.indexOf(':')>-1){
+                exp = new RegExp('^' + c.name.replace(mid,'([^\s]+)') + '$','i');                
+            }   
+            else if(c.name.indexOf('*')>-1){
+                exp = new RegExp('^' + c.name.replace(end,'(.*?)') + '$','i');
+            }
+        }
+        else {
+            exp = new RegExp('^' + c.name + '$','i');
+        }
+        commands.push({
+            regexp: exp,
+            special: c.special,
+            name: c.name,
+            response: c.response
+        });
     });
 };
 
@@ -197,7 +223,7 @@ voiceCommands.setResponseHandler = function(handler){
 voiceCommands.start = function(){
     takingCommands = true;
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition)();
-    recognition.lang = 'en-US';
+    recognition.lang = lang;
     recognition.interimResults = false;
     recognition.maxAlternatives = 5;
     
@@ -237,29 +263,29 @@ voiceCommands.start = function(){
             }
         }
         else if(startedAI){
-            var flag = true;
-            for(key in e.results[0]){
-                if(flag && e.results[0][key].transcript !== undefined){
-                    commands.forEach(function(c){
-                        if(flag && detailedMatch(e.results[0][key].transcript,c.name)){
-                            handleCommand(c);
-                            flag = false;
-                        }
-                    });
-                }
+            if(e.results[0][0].transcript.toLowerCase().indexOf('search')==0) {
+                performSearch(e.results[0][0].transcript.toLowerCase());
             }
-            if(flag){
-                if(e.results[0][0].transcript.toLowerCase().indexOf('search')==0) {
-                    performSearch(e.results[0][0].transcript.toLowerCase());
+            else if(e.results[0][0].transcript.toLowerCase().indexOf('play')==0) {
+                playYoutube(e.results[0][0].transcript.toLowerCase());
+            }
+            else if(e.results[0][0].transcript.toLowerCase().indexOf('stop playing')==0) {
+                closeYoutube();
+            }
+            else {
+                var flag = true;
+                for(key in e.results[0]){
+                    if(flag && e.results[0][key].transcript !== undefined){
+                        commands.forEach(function(c){
+                            if(flag && c.regexp.exec(e.results[0][key].transcript) !== null){
+                                handleCommand(c);
+                                flag = false;
+                            }
+                        });
+                    }
                 }
-                else if(e.results[0][0].transcript.toLowerCase().indexOf('play')==0) {
-                    playYoutube(e.results[0][0].transcript.toLowerCase());
-                }
-                else if(e.results[0][0].transcript.toLowerCase().indexOf('stop playing')==0) {
-                    closeYoutube();
-                }
-                else addNewCommand(e.results[0][0].transcript);
-            }    
+                if(flag) addNewCommand(e.results[0][0].transcript.toLowerCase());
+            }  
         }                   
     };
 };

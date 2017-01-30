@@ -58,14 +58,23 @@ io.on('connection',function(socket){
             diffX = s.alpha - data.alpha;
             diffY = s.beta - data.beta;
             diffZ = s.gamma - data.gamma;
-            if(diffX > 20 || diffY > 20 || diffZ > 20){
+            if(diffX > 20 /*|| diffY > 20 || diffZ > 20*/){
                 console.log(data);
             }
         }
     });
     socket.on('motion',function(data){
-        if(data.x > 2 || data.y > 2 || data.z > 2){
-            console.log(data);
+        if(data.x>2){
+            io.sockets.emit('move left');
+        }
+        else if(data.x<-2){
+            io.sockets.emit('move right');
+        }
+        else if(data.y<-2){
+            io.sockets.emit('move up');
+        }
+        else if(data.y>2){
+            io.sockets.emit('move down');
         }
     });    
     socket.on('disconnect',function(){
