@@ -1,8 +1,10 @@
 var voiceCommands = window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition;
 
+voiceCommands.lang = 'en-US'; //default language
+
 var commands = [];
 var recognition,takingCommands,responseHandler,triggerStart = 'start',triggerStop = 'stop',
-    startedAI = false,searchTab,youtubeTab,lang = 'en-US';
+    startedAI = false,searchTab,youtubeTab,voices;
 
 var DEVELOPER_KEY = 'AIzaSyDRoMTMNKWy59X-8NELgZn2Y883tgl43C8', //personal key in Google API Console
     CSE_ID = '014918255508942225227:m3yrvj0uyhg'; //personal Google custom search engine ID
@@ -13,9 +15,9 @@ var mid = /\:\w+/g;
 var end = /(\*[^/]+)$/g;
 
 window.speechSynthesis.onvoiceschanged = function(){
-    var voices = window.speechSynthesis.getVoices();
+    voices = window.speechSynthesis.getVoices();
     for(i in voices){
-        if(voices[i].lang == lang){
+        if(voices[i].lang == voiceCommands.lang){
             voiceCommands.selectedVoice = voices[i];
             break;
         }
@@ -71,7 +73,7 @@ var handleCommand = function(c,text){
         voiceCommands.speak('please say something for the ' + c.name);
         setTimeout(function(){
             var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition                       || window.msSpeechRecognition || window.oSpeechRecognition)();
-            recognitionInner.lang = lang;
+            recognitionInner.lang = voiceCommands.lang;
             recognitionInner.interimResults = false;
             recognitionInner.maxAlternatives = 5;    
             recognitionInner.start();
@@ -166,11 +168,21 @@ var closeYoutube = function(){
     else voiceCommands.speak('am not playing anything');
 };
 
+voiceCommands.setLang = function(lang){
+    for(i in voices){
+        if(voices[i].lang == voiceCommands.lang){
+            voiceCommands.lang = lang;
+            voiceCommands.selectedVoice = voices[i];
+            break;
+        }
+    }
+};
+
 voiceCommands.getUserInput = function(cb){
     takingCommands = false;
     recognition.stop(); 
     var recognitionInner = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition)();
-    recognitionInner.lang = lang;
+    recognitionInner.lang = voiceCommands.lang;
     recognitionInner.interimResults = false;
     recognitionInner.maxAlternatives = 5;    
     recognitionInner.start();
@@ -193,7 +205,7 @@ voiceCommands.speak = function(text){
     msg.rate = 1; // 0.1 to 10
     msg.pitch = 1; //0 to 2
     msg.text = text;
-    msg.lang = lang;
+    msg.lang = voiceCommands.lang;
     window.speechSynthesis.speak(msg); 
     console.log('Speaking - ' + text);
     setTimeout(function(){
@@ -233,7 +245,7 @@ voiceCommands.setResponseHandler = function(handler){
 voiceCommands.start = function(){
     takingCommands = true;
     recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition || window.mozSpeechRecognition || window.msSpeechRecognition || window.oSpeechRecognition)();
-    recognition.lang = lang;
+    recognition.lang = voiceCommands.lang;
     recognition.interimResults = false;
     recognition.maxAlternatives = 5;
     

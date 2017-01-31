@@ -46,6 +46,7 @@
                         method: 'GET',
                         url: 'http://localhost:3000/commands'
                     }).done(function(res){
+                        voiceCommands.setLang('en-GB');
                         voiceCommands.setCommands(res);
                         voiceCommands.setResponseHandler(appResponseHandler);
                         voiceCommands.start();
