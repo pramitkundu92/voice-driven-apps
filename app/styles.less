@@ -157,14 +157,31 @@ body {
                     .border(10px, lighten(@base, 10%));
                     display: inline-block;
                 }
-            }
-            button {
-                .border(8px, lighten(@base, 35%));
-                cursor: pointer;
-                &:hover {
-                    box-shadow: 0 5px 5px solid lighten(@base, 10%);
+                a {
+                    .margin(6px, left);
                 }
             }
         }
-    }    
+        .uploader {
+            height: 17px;
+            width: 300px;
+            .border(5px, lighten(@base, 30%));
+            box-shadow: 0 0 3px 3px lighten(@base, 10%);
+            .position(absolute);
+            top: 30%;
+            left: 40%;
+            background-color: lighten(@base, 30%);
+            .padding(13px);
+        }
+        button {
+            .border(8px, lighten(@base, 35%));
+            cursor: pointer;
+            &:hover {
+                box-shadow: 0 5px 5px solid lighten(@base, 10%);
+            }
+        }
+    }
+    .invisible {
+        display: none;
+    }
 }

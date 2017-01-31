@@ -73,7 +73,25 @@ body .main form .form-control textarea {
   border: 2px solid #787878;
   display: inline-block;
 }
-body .main form button {
+body .main form .form-control a {
+  margin-left: 6px;
+}
+body .main .uploader {
+  height: 17px;
+  width: 300px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  border-radius: 5px;
+  border: 2px solid #ababab;
+  box-shadow: 0 0 3px 3px #787878;
+  position: absolute;
+  top: 30%;
+  left: 40%;
+  background-color: #ababab;
+  padding: 13px;
+}
+body .main button {
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;
   -ms-border-radius: 8px;
@@ -81,6 +99,9 @@ body .main form button {
   border: 2px solid #b7b7b7;
   cursor: pointer;
 }
-body .main form button:hover {
+body .main button:hover {
   box-shadow: 0 5px 5px solid #787878;
+}
+body .invisible {
+  display: none;
 }

@@ -3,6 +3,7 @@ var fs = require('fs');
 var express = require('express');
 var bodyParser = require('body-parser');
 var socket = require('socket.io');
+var formidable = require('formidable');
 
 var app = express();
 app.use(express.static(__dirname));
@@ -39,6 +40,36 @@ app.get('/updatecomm',function(req,res){
                 }
             });
         }
+    });
+});
+app.post('/uploaddata',function(req,res){
+    var form = new formidable.IncomingForm(),userData = {},socketId;
+    form.keepExtensions = true;
+    form.uploadDir = './uploads';
+    form.on('file',function(field, file){
+        fs.rename(file.path,form.uploadDir + '/' + file.name);  
+    });
+    form.on('field',function(name,value){
+        if(name == 'socketId') {
+            socketId = value;
+            io.to(socketId).emit('upload-start');
+        }
+        else userData[name] = value;
+    }); 
+    form.on('progress',function(recd,exp){
+        io.to(socketId).emit('upload-progress',((recd/exp)*100).toFixed());    
+    });
+    form.on('end',function(){
+        io.to(socketId).emit('upload-stop');
+    });
+    form.on('error', function(err) {
+        console.error(err);
+    }); 
+    form.parse(req, function(err, fields, files) {
+        console.log(userData);
+        res.header('Content-Type', 'application/json');
+        res.header('Access-control-allow-origin', '*');
+        res.json({uploaded: true}); 
     });
 });
 

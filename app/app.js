@@ -93,3 +93,41 @@ function moveItem(data){
     $('#'+data.id).css('top',Math.floor(data.y));
     $('#'+data.id).css('position','absolute');
 };
+
+function uploadFile(){
+    var fd = new FormData();
+    fd.append('socketId',socket.id);
+    fd.append('firstname',document.getElementById('firstname').value);
+    fd.append('lastname',document.getElementById('lastname').value);
+    fd.append('password',document.getElementById('password').value);
+    fd.append('mobile',document.getElementById('mobile').value);
+    fd.append('address',document.getElementById('address').value);
+    fd.append('file',document.getElementById('file').files[0]);
+    $.ajax({
+        type: 'POST',
+        url: 'http://' + localIP + ':' + PORT + '/uploaddata',
+        cache: false,
+        contentType: false,
+        processData: false,
+        data: fd
+    }).done(function(response){
+        document.getElementById('firstname').value = '';
+        document.getElementById('lastname').value = '';
+        document.getElementById('password').value = '';
+        document.getElementById('mobile').value = '';
+        document.getElementById('address').value = '';
+        document.getElementById('file').value = null;
+    }).fail(function(err){
+        console.error(err);
+    });
+};
+var uploader = $('#upload-progress'),value = $('#progress-value');
+socket.on('upload-start',function(data){
+    uploader.removeClass('invisible');
+});
+socket.on('upload-stop',function(data){
+    uploader.addClass('invisible');
+});
+socket.on('upload-progress',function(data){
+    value.html(data + ' %');
+});

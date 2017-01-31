@@ -12,7 +12,10 @@
         <header>A Simple User Data form</header>
         <div class="main">
             <a onclick="showMobileUrl()">View Mobile URL</a>
-            <button id="movable" style="left:50%;top:50%;position:absolute">Movable</button>
+            <!--<button id="movable" style="left:50%;top:50%;position:absolute">Movable</button>-->
+            <div class="uploader invisible" id="upload-progress">
+                Uploading . . . <span id="progress-value"></span>
+            </div>
             <form>
                 <div class="form-control">
                     <label for="FirstName">First Name</label>
@@ -34,12 +37,12 @@
                     <label for="Mobile">Mobile</label>
                     <input name="Mobile" id="mobile" type="text"/>
                 </div>
-                <!--<div class="form-control">
+                <div class="form-control">
+                    <label>Resume</label>
                     <input name="file" id="file" type="file"/>
-                </div>-->                
-                <button>Register</button>
+                </div> 
             </form>
-            <a onclick="triggerEvent()">Trigger an event on your socket</a>
+            <button onclick="uploadFile()">upload</button>
         </div>
         <footer>This is a demo page</footer>
         <script type="text/javascript" src="jquery.min.js"></script>
