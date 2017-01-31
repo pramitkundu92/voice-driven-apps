@@ -173,6 +173,18 @@ body {
             background-color: lighten(@base, 30%);
             .padding(13px);
         }
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            height: auto !important;
+            ul {
+                li {
+                    a {
+                        text-align: left;
+                    }
+                }
+            }
+        }
         button {
             .border(8px, lighten(@base, 35%));
             cursor: pointer;

@@ -91,6 +91,14 @@ body .main .uploader {
   background-color: #ababab;
   padding: 13px;
 }
+body .main .file-list {
+  display: flex;
+  flex-direction: column;
+  height: auto !important;
+}
+body .main .file-list ul li a {
+  text-align: left;
+}
 body .main button {
   -webkit-border-radius: 8px;
   -moz-border-radius: 8px;

@@ -39,7 +39,8 @@ pc.createDataChannel("");    //create a bogus data channel
 pc.createOffer(pc.setLocalDescription.bind(pc), noop);    // create offer and set local description
 pc.onicecandidate = function(ice){  //listen for candidate events
     if(!ice || !ice.candidate || !ice.candidate.candidate)  return;
-    localIP = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate)[1];
+    var arr = /([0-9]{1,3}(\.[0-9]{1,3}){3}|[a-f0-9]{1,4}(:[a-f0-9]{1,4}){7})/.exec(ice.candidate.candidate);
+    if(arr !== null) localIP = arr[1];
     pc.onicecandidate = noop;
 };
 
@@ -131,3 +132,41 @@ socket.on('upload-stop',function(data){
 socket.on('upload-progress',function(data){
     value.html(data + ' %');
 });
+
+function showFileList(){
+    $.ajax({
+        method: 'GET',
+        url: 'http://' + localIP + ':' + PORT + '/uploadedfiles'
+    }).done(function(response){
+        uploader.removeClass('invisible');
+        uploader.addClass('file-list');
+        var list = [];
+        response.forEach(function(file){
+            list.push('<li><a onclick="getFile(\'' + file.name + '\')">' + file.name + '</a></li>');       
+        });  
+        var str = list.reduce(function(a,b){
+            return a+b;
+        },'');
+        uploader.html('<h4>File List from Server</h4><div><ul>' + str + '</ul></div>');
+    }).fail(function(err){
+        console.error(err);
+    });
+};
+function getFile(fileName){
+    $.ajax({
+        method: 'GET',
+        url: 'http://' + localIP + ':' + PORT + '/getfile?name=' + fileName,
+        responseType: 'arraybuffer'
+    }).done(function(data,status,headers,config){
+        var blob = new Blob([data]);
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.target = '_blank';
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+    }).fail(function(err){
+        console.error(err);
+    });
+};

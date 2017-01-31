@@ -4,6 +4,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var socket = require('socket.io');
 var formidable = require('formidable');
+var mimeTypes = require('mime-types');
 
 var app = express();
 app.use(express.static(__dirname));
@@ -12,6 +13,8 @@ app.use(bodyParser.json());
 var server = http.createServer(app);
 var io = socket(server);
 var PORT = 3000;
+var uploadPath = './uploads';
+var fileMode = 'r';
 
 app.get('/index.html',function(req,res){
     res.sendFile(__dirname + '/index.html');
@@ -45,7 +48,7 @@ app.get('/updatecomm',function(req,res){
 app.post('/uploaddata',function(req,res){
     var form = new formidable.IncomingForm(),userData = {},socketId;
     form.keepExtensions = true;
-    form.uploadDir = './uploads';
+    form.uploadDir = uploadPath;
     form.on('file',function(field, file){
         fs.rename(file.path,form.uploadDir + '/' + file.name);  
     });
@@ -70,6 +73,37 @@ app.post('/uploaddata',function(req,res){
         res.header('Content-Type', 'application/json');
         res.header('Access-control-allow-origin', '*');
         res.json({uploaded: true}); 
+    });
+});
+app.get('/uploadedfiles',function(req,res){
+    fs.readdir(uploadPath,function(err,files){
+        if(!err){
+            res.header('Content-Type', 'application/json');
+            res.header('Access-control-allow-origin', '*');
+            res.json(files.map(function(f){
+                return {name: f};
+            })); 
+        }    
+    });
+});
+app.get('/getfile',function(req,res){
+    var filePath = uploadPath + '/' + req.query.name, fileDesc, buff;
+    fs.open(filePath, fileMode, function(err,fd){
+        if(!err){
+            fileDesc = fd;
+            fs.stat(filePath, function(err,stats){
+                buff = new Buffer(stats.size);
+                fs.read(fileDesc, buff, 0, buff.length, 0, function(err, bytes){
+                    if(!err){
+                        res.setHeader('Content-disposition', 'attachment; filename=' + filePath);
+                        res.setHeader('Content-Type', mimeTypes.lookup(filePath));
+                        res.setHeader('File-Name', req.query.name);
+                        res.setHeader('Access-control-allow-origin', '*');
+                        res.send(buff);
+                    }    
+                });
+            });
+        }    
     });
 });
 
