@@ -87,21 +87,22 @@ app.get('/uploadedfiles',function(req,res){
     });
 });
 app.get('/getfile',function(req,res){
-    var filePath = uploadPath + '/' + req.query.name, fileDesc, buff;
+    var filePath = uploadPath + '/' + req.query.name, buff;
     fs.open(filePath, fileMode, function(err,fd){
         if(!err){
-            fileDesc = fd;
             fs.stat(filePath, function(err,stats){
-                buff = new Buffer(stats.size);
-                fs.read(fileDesc, buff, 0, buff.length, 0, function(err, bytes){
-                    if(!err){
-                        res.setHeader('Content-disposition', 'attachment; filename=' + filePath);
-                        res.setHeader('Content-Type', mimeTypes.lookup(filePath));
-                        res.setHeader('File-Name', req.query.name);
-                        res.setHeader('Access-control-allow-origin', '*');
-                        res.send(buff);
-                    }    
-                });
+                if(!err) {
+                    buff = new Buffer(stats.size);
+                    fs.read(fd, buff, 0, buff.length, 0, function(err, bytes){
+                        if(!err){
+                            res.setHeader('Content-disposition', 'attachment; filename=' + filePath);
+                            res.setHeader('Content-Type', mimeTypes.lookup(filePath));
+                            res.setHeader('FileName', req.query.name);
+                            res.setHeader('Access-control-allow-origin', '*');
+                            res.send(buff); 
+                        }    
+                    });
+                }                
             });
         }    
     });

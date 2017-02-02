@@ -153,20 +153,33 @@ function showFileList(){
     });
 };
 function getFile(fileName){
-    $.ajax({
-        method: 'GET',
-        url: 'http://' + localIP + ':' + PORT + '/getfile?name=' + fileName,
-        responseType: 'arraybuffer'
-    }).done(function(data,status,headers,config){
-        var blob = new Blob([data]);
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement('a');
-        a.href = url;
-        a.target = '_blank';
-        a.download = fileName;
-        document.body.appendChild(a);
-        a.click();
-    }).fail(function(err){
-        console.error(err);
-    });
+    var xhr = new XMLHttpRequest(),url = 'http://' + localIP + ':' + PORT + '/getfile?name=' + fileName;
+    var chunks = [],time = 0,interval;
+    xhr.open('GET',url,true);
+    xhr.responseType = 'arraybuffer';
+    interval = setInterval(function(){
+        time++;
+        console.log('Loading for ' + time + ' seconds...');
+    },1000); 
+    xhr.onreadystatechange = function(e){
+        if(xhr.readyState === XMLHttpRequest.OPENED) { 
+        
+        }
+        else if(xhr.readyState === XMLHttpRequest.LOADING) {
+            
+        }
+        else if(xhr.readyState === XMLHttpRequest.DONE) {
+            clearInterval(interval);
+            var blob = new File([this.response],{type: this.getResponseHeader('Content-Type')});
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.target = '_blank';
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+        }
+    }
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send();
 };
