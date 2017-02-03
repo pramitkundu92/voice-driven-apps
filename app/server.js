@@ -95,10 +95,10 @@ app.get('/getfile',function(req,res){
                     buff = new Buffer(stats.size);
                     fs.read(fd, buff, 0, buff.length, 0, function(err, bytes){
                         if(!err){
-                            res.setHeader('Content-disposition', 'attachment; filename=' + filePath);
-                            res.setHeader('Content-Type', mimeTypes.lookup(filePath));
-                            res.setHeader('FileName', req.query.name);
-                            res.setHeader('Access-control-allow-origin', '*');
+                            res.header('Content-disposition', 'attachment; filename=' + filePath);
+                            res.header('Content-Type', mimeTypes.lookup(filePath));
+                            res.header('FileName', req.query.name);
+                            res.header('Access-control-allow-origin', '*');
                             res.send(buff); 
                         }    
                     });
@@ -106,10 +106,17 @@ app.get('/getfile',function(req,res){
             });
         } 
         else {
-            res.json({error: 'File not found on server'});
+            errorHandler(res,'File not found on server');
         }
     });
 });
+
+function errorHandler(res,err){
+    res.header('Content-Type','text/plain');
+    res.status(500);
+    res.write(err);
+    res.end();
+}
 
 //socket code 
 var connectedSockets = {}; //track sockets
