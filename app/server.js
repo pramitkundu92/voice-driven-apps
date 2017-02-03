@@ -104,7 +104,10 @@ app.get('/getfile',function(req,res){
                     });
                 }                
             });
-        }    
+        } 
+        else {
+            res.json({error: 'File not found on server'});
+        }
     });
 });
 
