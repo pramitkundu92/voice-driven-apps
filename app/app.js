@@ -1,5 +1,6 @@
 var PORT = 3000,localIP;
 var socket = io.connect({query: {userId: 1}});
+var rest = new RestCaller();
 var comm = [{
     name: 'fill form',
     response: 'Mention a field Name'
@@ -134,21 +135,19 @@ socket.on('upload-progress',function(data){
 });
 
 function showFileList(){
-    $.ajax({
-        method: 'GET',
-        url: 'http://' + localIP + ':' + PORT + '/uploadedfiles'
-    }).done(function(response){
+    rest.setConfig('GET','http://' + localIP + ':' + PORT + '/uploadedfiles')
+    rest.call().then(function(response){
         uploader.removeClass('invisible');
         uploader.addClass('file-list');
         var list = [];
-        response.forEach(function(file){
+        response.data.forEach(function(file){
             list.push('<li><a onclick="getFile(\'' + file.name + '\')">' + file.name + '</a></li>');       
         });  
         var str = list.reduce(function(a,b){
             return a+b;
         },'');
         uploader.html('<h4>File List from Server</h4><div><ul>' + str + '</ul></div>');
-    }).fail(function(err){
+    },function(err){
         console.error(err);
     });
 };
@@ -183,3 +182,11 @@ function getFile(fileName){
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.send();
 };
+
+/* trials */
+/*var rest = new RestCaller('GET','http://localhost:' + PORT + '/uploadedfiles');
+rest.call().then(function(response){
+    console.log(response);
+},function(err){
+    console.error(err);
+});*/
